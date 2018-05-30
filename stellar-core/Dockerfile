@@ -1,8 +1,7 @@
-FROM debian:stretch
+FROM debian:stretch AS build
 
 # Build Arguements
 ARG STELLAR_CORE_VERSION="v9.2.0"
-ARG STELLAR_CORE_DEPS="curl libpq5"
 ARG STELLAR_CORE_BUILD_DEPS="git build-essential pkg-config autoconf automake libtool bison flex libpq-dev wget pandoc"
 
 # Install build deps
@@ -19,14 +18,17 @@ RUN ./autogen.sh && \
     make && \
     make install
 
+# Finish build
+FROM debian:stable-slim
+
+# Build Arguements
+ARG STELLAR_CORE_DEPS="curl libpq5"
+
 # Install runtime deps
-RUN apt-get install -y $STELLAR_CORE_DEPS
+RUN apt-get update && \
+    apt-get install -y $STELLAR_CORE_DEPS
 
-# Remove  build deps
-RUN apt-get remove -y $STELLAR_CORE_BUILD_DEPS && \
-    apt-get autoremove -y && \
-    rm -rf /var/lib/apt/lists/*
-
+COPY --from=build /usr/local/bin/stellar-core /usr/local/bin/stellar-core
 
 # Peer Network -> 11625
 # HTTP Server  -> 11626 (NOTE: Do not expose publically)
