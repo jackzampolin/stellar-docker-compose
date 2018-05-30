@@ -1,0 +1,50 @@
+version: '3'
+services:
+  postgres-core:
+    image: $PG_IMAGE
+    volumes:
+      - "$DATA_DIR/postgres-core:/var/lib/postgresql/data"
+    environment:
+      - POSTGRES_DB=$STELLAR_CORE_DB
+  postgres-horizon:
+    image: $PG_IMAGE
+    volumes:
+      - "$DATA_DIR/postgres-horizon:/var/lib/postgresql/data"
+    environment:
+      - POSTGRES_DB=$HORIZON_DB
+  stellar-core:
+    build:
+      context: ./stellar-core
+      args:
+        STELLAR_CORE_VERSION: $STELLAR_CORE_VERSION
+    image: jackzampolin/stellar-core:$STELLAR_CORE_VERSION
+    restart: on-failure
+    links:
+      - postgres-core
+    ports:
+      # peer port
+      - "11625:11625"
+    volumes:
+      # Data volume
+      - "$DATA_DIR/core:/data"
+      # Configuration file
+      - "./stellar-core/stellar-core-testnet.cfg:/stellar-core.cfg"
+  horizon:
+    build:
+      context: ./horizon
+      args:
+        HORIZON_VERSION: $HORIZON_VERSION
+    image: jackzampolin/horizon:$HORIZON_VERSION
+    restart: on-failure
+    links:
+      - stellar-core
+      - postgres-horizon
+      - postgres-core
+    ports:
+      # HTTP port
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgres://postgres@postgres-horizon/stellar-horizon?sslmode=disable
+      STELLAR_CORE_DATABASE_URL: postgres://postgres@postgres-core/stellar-core?sslmode=disable
+      STELLAR_CORE_URL: http://stellar-core:11626
+      INGEST: "true"
