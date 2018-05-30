@@ -2,12 +2,14 @@
 
 This is an alternate way to spin up `stellar-core` and `horizon` with their associated databases. It was inspired by the gist example from [Satoshi Labs](https://gist.github.com/andrenarchy/bf56cfbded42da48e2e255a11de7cb49). The images build and run from this directory. There are prebuild images for some versions of `horizon` and `stellar-core` in the following quay repositories:
 
-- `quay.io/jackzampolin/horizon`
-- `quay.io/jackzampolin/stellar-core`
+- [`quay.io/jackzampolin/horizon`](https://quay.io/repository/jackzampolin/horizon)
+- [`quay.io/jackzampolin/stellar-core`](https://quay.io/repository/jackzampolin/stellar-core)
 
 ### Running
 
-To run this just pull down the repository (`git clone github.com/jackzampolin/stellar-docker-compose`) and run `docker-compose up`. That will pull down the prebuilt images and run them. Data will be stored in the `./data/testnet` directory. Once all the services are up you should see logs streaming and `horizon` will be available at `localhost:8000`
+To run this just pull down the repository (`git clone github.com/jackzampolin/stellar-docker-compose`) and run `docker-compose up`. That will pull down the prebuilt images and run them. Data will be stored in the `./data/testnet` directory. Once all the services are up you should see logs streaming and `horizon` will be available at `localhost:8000`.
+
+Configuration files from each
 
 ### Building
 
@@ -27,4 +29,4 @@ horizon:
     args:
       HORIZON_VERSION: $HORIZON_VERSION
 ```
-If you would like to change the version of either `stellar-core` or `horizon` you can do so in the `./.env` file. That file also controls the location of the data directory. 
+If you would like to change the version of either `stellar-core` or `horizon` you can do so in the `./.env` file. That file also controls the location of the data directory.
